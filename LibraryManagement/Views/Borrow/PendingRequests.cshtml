@@ -1,0 +1,130 @@
+@model List<LibraryManagement.Models.PendingRequestViewModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Approve Pending Request";
+}
+@{
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>;//viewbag for status name
+}
+
+<h2>Pending Request Approval</h2>
+
+<div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px">
+    @using (Html.BeginForm("PendingRequests", "Borrow", FormMethod.Get))
+    {
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchFullName" name="searchFullName" placeholder="Search by Member Name..." />
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchMembershipCode" name="searchMembershipCode" placeholder="Search by Membership Code..." />
+
+        </div>
+
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchBookName" name="searchBookName" placeholder="Search by Book Title..." />
+
+        </div>
+        <div class="col-md-2">
+            <input type="text"
+                   class="form-control"
+                   id="SearchRequestDate"
+                   name="SearchRequestDate"
+                   placeholder="Request Date" />
+        </div>
+        
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary">Go</button>
+
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary" onclick="clearFilters()">Clear</button>
+
+            @* <a href="@Url.Action("Index", "Book")" class="btn btn-primary">Clear</a> *@
+
+
+        </div>
+
+
+    }
+
+
+
+</div>
+
+<div class="row" style="padding-bottom: 10px">
+    <div class="col-lg-12">
+
+    </div>
+
+</div>
+<table class="table">
+    <tr>
+        <th>Borrow Id</th>
+        <th>Book</th>
+        <th>Requesting Member Code</th>
+        <th>Requesting Member Name</th>
+
+        <th>Request Date</th>
+
+        <th></th>
+    </tr>
+   
+
+    @foreach (var borrow in Model)
+    {
+
+        <tr class="record-item">
+            <td>@borrow.BorrowId</td>
+            <td>@borrow.BookTitle</td>
+            <td>@borrow.MembershipCode</td>
+            <td>@borrow.MemberName</td>
+            <td>@borrow.RequestDate </td>
+           
+            <td>
+                @if (Convert.ToInt64(Session["UserRole"].ToString()) != 3)
+                {
+                    using (Html.BeginForm("ApproveRequest", "Borrow", FormMethod.Post)) 
+                    {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@borrow.BorrowId" /> 
+                                <input type="submit" value="ApproveRequest" class="btn btn-danger"/>
+                        
+                    }
+
+                }
+            </td>
+        </tr>
+    }
+</table>
+<div class="pagination-container" id="pagination-controls"></div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<script>
+function clearFilters() {
+document.getElementById("searchUserId").value = "";
+document.getElementById("searchFullName").value = "";
+document.getElementById("searchEmail").value = "";
+const roleDropdown = document.getElementById("SearchRoleID");
+if (roleDropdown) {
+roleDropdown.selectedIndex = 0;
+}
+window.location.href = '@Url.Action("Index", "User")';
+}
+</script>
+<script>
+    flatpickr("#SearchRequestDate", {
+        dateFormat: "Y-m-d", // Use "d-m-Y" if you prefer dd-mm-yyyy
+        allowInput: true
+    });
+</script>

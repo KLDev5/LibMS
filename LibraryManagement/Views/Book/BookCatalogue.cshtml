@@ -1,0 +1,109 @@
+@model List<LibraryManagement.Models.Book>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Books Catalogue";
+}
+@{
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>;//viewbag for status name
+}
+<h2>Request for Borrowing Book</h2>
+@* <p> *@
+@*     @Html.ActionLink("Create New", "Create") *@
+@* </p> *@
+<div class="row" style="padding-bottom: 10px">
+    <div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px">
+        @using (Html.BeginForm("BookCatalogue", "Book", FormMethod.Get))
+        {
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchTitle" name="searchTitle" placeholder="Search by title..." />
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchAuthor" name="searchAuthor" placeholder="Search by Author..." />
+
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchPublisher" name="searchPublisher" placeholder="Search by Publisher..." />
+
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary">Go</button>
+
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary" onclick="clearFilters()">Clear</button>
+
+                @* <a href="@Url.Action("Index", "Book")" class="btn btn-primary">Clear</a> *@
+
+
+            </div>
+
+
+        }
+
+
+
+    </div>
+
+</div>
+<table class="table" id="borrowTable">
+    <tr>
+        <th>Book ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Published Year</th>
+        <th>Book Status</th>
+        <th></th>
+    </tr>
+  
+
+    @foreach (var book in Model)
+    {
+
+        <tr class="record-item">
+            <td>@book.BookId</td>
+            <td>@book.Title</td>
+            <td>@book.Author</td>
+            <td>@book.PublishedDate</td>
+            <td>
+                @{
+                    var status = statuses?.FirstOrDefault(c => c.BookStatusID == book.BookStatusID);
+                    @(status != null ? status.BookStatusName : "No Status")
+                    ;
+
+                }
+            </td>
+            <td>
+                <a href="@Url.Action("Index", "Borrow", new { id = book.BookId })" class="btn btn-warning">Request Book</a>
+                @* <span class="btn btn-success">@Html.ActionLink("Details", "Details", new { id = book.BookId })</span> | *@
+                @* <span class="btn btn-danger"> @Html.ActionLink("Delete", "Delete", new { id = book.BookId })</span> *@
+            </td>
+        </tr>
+    }
+</table>
+<div class="pagination-container" id="pagination-controls"></div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<script>
+function clearFilters() {
+document.getElementById("searchUserId").value = "";
+document.getElementById("searchFullName").value = "";
+document.getElementById("searchEmail").value = "";
+const roleDropdown = document.getElementById("SearchRoleID");
+if (roleDropdown) {
+roleDropdown.selectedIndex = 0;
+}
+window.location.href = '@Url.Action("BookCatalogue", "Book")';
+}
+</script>

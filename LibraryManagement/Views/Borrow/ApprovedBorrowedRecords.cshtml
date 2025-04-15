@@ -1,0 +1,155 @@
+@model List<LibraryManagement.Models.ApprovedBorrowedRecordsViewModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Approve Pending Request";
+}
+
+<h2>Approved Requests / Borrowed Books</h2>
+<div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px; margin-bottom: 20px;">
+    @using (Html.BeginForm("ApprovedBorrowedRecords", "Borrow", FormMethod.Get))
+    {
+        <!-- First row -->
+        <div class="row d-flex gap-2 align-items-end mb-2" style="margin-bottom: 20px;">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="borrowerMembershipCode" name="borrowerMembershipCode" placeholder="Borrower Membership Code" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="borrowId" name="borrowId" placeholder="Borrow ID" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="borrowerFullName" name="borrowerFullName" placeholder="Borrower Full Name" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="approverMembershipCode" name="approverMembershipCode" placeholder="Approver Membership Code" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="approverFullName" name="approverFullName" placeholder="Approver Full Name" />
+            </div>
+        </div>
+
+        <!-- Second row -->
+        <div class="row d-flex gap-2 align-items-end">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="bookTitle" name="bookTitle" placeholder="Book Title" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="borrowDate" name="borrowDate" placeholder="Borrow Date" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="scheduledReturnDate" name="scheduledReturnDate" placeholder="Scheduled Return Date" />
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-control" id="overdueStatus" name="overdueStatus">
+                    <option value=""> -Filter Overdue/Not Overdue-</option>
+                    <option value="1">Overdue</option>
+                    <option value="0">Not Overdue</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Go</button>
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" class="btn btn-secondary w-100" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+    }
+</div>
+<table class="table">
+    <tr>
+        <th>Borrow Id</th>
+        <th>Borrower Membership Code</th>
+        <th>BorrowerName</th>
+        <th>Approver Membership Code</th>
+        <th>ApproverName</th>
+        <th>Book</th>
+        <th>Borrow Date</th>
+        <th>Scheduled Return Date</th>
+        <th>Actual Return Date</th>
+        <th>Overdue Status</th>
+        <th>Overdue Amount</th>
+        <th>BookStatus</th>
+
+        <th></th>
+    </tr>
+    @{
+        var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>;//viewbag for status name
+    }
+
+    @foreach (var borrow in Model)
+    {
+
+        <tr class="record-item">
+            <td>@borrow.BorrowId</td>
+            <td>@borrow.BorrowerMembershipCode</td>
+            <td>@borrow.BorrowerName</td>
+            <td>@borrow.ApproverMembershipCode</td>
+            <td>@borrow.ApproverName </td>
+            <td>@borrow.Book</td>
+            <td>@borrow.BorrowDate</td>
+            <td>@borrow.ScheduledReturnDate</td>
+            <td>@borrow.ActualReturnDate</td>
+        <td>@(
+                borrow.OverdueStatus == true ? "Overdue" : "Not Overdue"
+            )</td>
+            <td>@borrow.OverdueAmount</td>
+            <td>@borrow.BookStatus</td>
+            @{
+                if (Convert.ToInt64(Session["UserRole"].ToString().Trim()) != 3)
+                {
+                    <td>
+                        <a href="@Url.Action("Return", "Borrow", new { id = borrow.BorrowId })" class="btn btn-warning">Return Book</a>
+                    </td>
+                }
+                    
+            }
+            
+
+           
+        </tr>
+    }
+</table>
+<div class="pagination-container" id="pagination-controls"></div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<script>
+function clearFilters() {
+document.getElementById("searchUserId").value = "";
+document.getElementById("searchFullName").value = "";
+document.getElementById("searchEmail").value = "";
+const roleDropdown = document.getElementById("SearchRoleID");
+if (roleDropdown) {
+roleDropdown.selectedIndex = 0;
+}
+window.location.href = '@Url.Action("Index", "User")';
+}
+</script>
+<script>
+    flatpickr("#borrowDate", {
+        dateFormat: "Y-m-d", // Use "d-m-Y" if you prefer dd-mm-yyyy
+        allowInput: true
+    });
+    flatpickr("#scheduledReturnDate", {
+        dateFormat: "Y-m-d", // Use "d-m-Y" if you prefer dd-mm-yyyy
+        allowInput: true
+    });
+</script>

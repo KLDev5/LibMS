@@ -1,0 +1,147 @@
+@model List<LibraryManagement.Models.BorrowRecordHistoryViewModel>
+
+@{
+    ViewBag.Title = "Borrow History All";
+    long roleid = Convert.ToInt64(Session["UserRole"].ToString());
+    long userid = Convert.ToInt64(Session["UserId"].ToString());
+
+}
+
+<h2>Borrow Transactions History</h2>
+
+<div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px; margin-bottom: 20px;">
+    @using (Html.BeginForm("BorrowRecordHistory", "Borrow", FormMethod.Get))
+    {
+        <!-- First row -->
+        <div class="row d-flex gap-2 align-items-end mb-2" style="margin-bottom: 20px;">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="BorrowRecordHistoryId" name="BorrowRecordHistoryId" placeholder="Borrow Record ID" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="BorrowEvent" name="BorrowEvent" placeholder="Borrow Event" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="BorrowingUserName" name="BorrowingUserName" placeholder="Borrower Full Name" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="ApprovingUserName" name="ApprovingUserName" placeholder="Approver Full Name" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="BorrowDate" name="BorrowDate" placeholder="Borrow Date" />
+            </div>
+        </div>
+
+        <!-- Second row -->
+        <div class="row d-flex gap-2 align-items-end">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="ScheduledReturnDate" name="ScheduledReturnDate" placeholder="Scheduled Return Date" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="ActualReturnDate" name="ActualReturnDate" placeholder="Actual Return Date" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="OverdueAmount" name="OverdueAmount" placeholder="Overdue Amount" />
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-control" id="OverdueStatus" name="OverdueStatus">
+                    <option value=""> -Filter Overdue/Not Overdue-</option>
+                    <option value="1">Overdue</option>
+                    <option value="0">Not Overdue</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Go</button>
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" class="btn btn-secondary w-100" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+    }
+</div>
+
+<table class="table" id="borrowTable">
+    <thead>
+    <tr>
+        <th>Record ID</th>
+        <th>Event</th>
+        <th>Book</th>
+        <th>Approver</th>
+        <th>Borrower</th>
+        <th>Event Date</th>
+        <th>Scheduled Return</th>
+        <th>Actual Return</th>
+        <th>Overdue Amount</th>
+        <th>Overdue Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var borrow in Model)
+    {
+        <tr class="record-item">
+            <td>@borrow.BorrowRecordHistoryId</td>
+            <td>@borrow.BorrowEvent</td>
+            <td>@borrow.Book</td>
+            <td>@borrow.Approver</td>
+            <td>@borrow.Borrower</td>
+            <td>@(borrow.EventDate.HasValue ? borrow.EventDate.Value.ToString("yyyy-MM-dd") : "Not Available")</td>
+            <td>@(borrow.ScheduledReturnDate.HasValue ? borrow.ScheduledReturnDate.Value.ToString("yyyy-MM-dd") : "Not Available")</td>
+            <td>@(borrow.ActualReturnDate.HasValue ? borrow.ActualReturnDate.Value.ToString("yyyy-MM-dd") : "Not Available")</td>
+            <td>@borrow.OverdueAmount</td>
+            <td>@borrow.OverdueStatus</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<div class="pagination-container" id="pagination-controls"></div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<script>
+    // Clear filters function
+    function clearFilters() {
+        document.getElementById('BorrowRecordHistoryId').value = '';
+        document.getElementById('BorrowEvent').value = '';
+        document.getElementById('BorrowingUserName').value = '';
+        document.getElementById('ApprovingUserName').value = '';
+        document.getElementById('BorrowDate').value = '';
+        document.getElementById('ScheduledReturnDate').value = '';
+        document.getElementById('ActualReturnDate').value = '';
+        document.getElementById('OverdueAmount').value = '';
+        document.getElementById('OverdueStatus').value = '';
+
+        window.location.href = '@Url.Action("BorrowRecordHistory", "Borrow")';
+
+    }
+
+    // JS client-side pagination logic
+  
+</script>
+
+<script>
+    // Initialize date pickers
+    flatpickr("#BorrowDate", { dateFormat: "Y-m-d", allowInput: true });
+    flatpickr("#ScheduledReturnDate", { dateFormat: "Y-m-d", allowInput: true });
+    flatpickr("#ActualReturnDate", { dateFormat: "Y-m-d", allowInput: true });
+</script>

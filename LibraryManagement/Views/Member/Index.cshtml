@@ -1,0 +1,190 @@
+@model List<LibraryManagement.Models.MemberView>
+@using PagedList.Mvc;
+
+
+
+@{
+    ViewBag.Title = "Member Lists";
+    var RolesList = ViewBag.RolesList;
+
+}
+
+<h2>All Member List</h2>
+
+<div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px">
+    @using (Html.BeginForm("Index", "Member", FormMethod.Get))
+    {
+        <!-- First row -->
+        <div class="row d-flex gap-2 align-items-end mb-2 " style="padding-bottom: 12px">
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="memberId" placeholder="Member ID" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="membershipCode" placeholder="Membership Code" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="fullName" placeholder="Full Name" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="phoneNumber" placeholder="Phone Number" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="address" placeholder="Address" />
+            </div>
+        </div>
+
+        <!-- Second row -->
+        <div class="row d-flex gap-2 align-items-end mb-2">
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="dateOfBirth" placeholder="Date of Birth" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="joinDate" placeholder="Join Date" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="email" placeholder="Email" />
+            </div>
+
+            <div class="col-md-2">
+                @Html.DropDownList("RoleId", (SelectList)RolesList, "- Filter by Role -", new { @class = "form-control" })
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Go</button>
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" class="btn btn-secondary w-100" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+    }
+</div>
+
+@* <p> *@
+@*     @Html.ActionLink("Create New", "Create") *@
+@* </p> *@
+@* <div class="row" style="padding-bottom: 10px"> *@
+@*     <div class="col-lg-12"> *@
+@* *@
+@*     </div> *@
+@*     <div class="col-lg-1"> *@
+@*         @using (Html.BeginForm("DeleteAll", "Book", FormMethod.Post)) *@
+@*         { *@
+@*             @Html.AntiForgeryToken() *@
+@* *@
+@*             <input type="submit" value="DeleteAll" class="btn btn-danger"/> *@
+@* *@
+@*         } *@
+@*     </div> *@
+@*     <div class="col-lg-6"> *@
+@*         @using (Html.BeginForm("DeleteAll", "Book", FormMethod.Post)) *@
+@*         { *@
+@*             @Html.AntiForgeryToken() *@
+@* *@
+@*             <input type="submit" value="DeleteAll" class="btn btn-danger"/> *@
+@* *@
+@*         } *@
+@*     </div > *@
+@* </div> *@
+<table class="table table-striped" style="overflow-x: scroll">
+    <tr>
+        <th>Member ID</th>
+        <th>Membership Code</th>
+        <th>Full Name</th>
+        <th>Phone Number</th>
+        <th>Address</th>
+        <th>Date of Birth</th>
+        <th>Join Date</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Books Borrowed</th>
+        <th> Books Overdue Count</th>
+        <th> Books Overdue Limit</th>
+        <th></th>
+    </tr>
+    @{
+        var Roles = ViewBag.Roles as List<LibraryManagement.Models.Role>;//viewbag for status name
+    }
+    @foreach (var member in Model)
+    {
+        <tr class="record-item">
+            <td>@member.MemberId</td>
+            <td>@member.MembershipCode</td>
+            <td>@member.FullName</td>
+            <td>@member.PhoneNumber</td>
+            <td>@member.Address</td>
+            <td>@(member.DateOfBirth?.ToString("yyyy-MM-dd") ?? "NaN")</td>
+            <td>@(member.JoinDate?.ToString("yyyy-MM-dd") ?? "NaN")</td>
+            <td>@member.Email</td>
+            <td>
+                @{
+                    var role = Roles?.FirstOrDefault(c => c.RoleId == member.RoleId);
+                    @(role != null ? role.RoleName : "NaN") ;
+
+                }
+                
+            </td>
+            <td>@member.TotalBooksBorrowed</td>
+            
+            <td>@member.OverdueCount</td>
+          
+            <td>@member.OverdueLimit</td>
+            
+            <td>
+                <span class="btn btn-warning" >@Html.ActionLink("Edit", "Edit", new { id = member.MemberId })</span>  |
+                <span class="btn btn-success" >@Html.ActionLink("Details", "Details", new { id = member.MemberId })</span> |
+            </td>
+            
+        </tr>
+    }
+</table>
+
+<div class="pagination-container" id="pagination-controls"></div>
+
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<script>
+    // Clear filters function for Member filters
+    function clearFilters() {
+        document.getElementsByName('memberId')[0].value = '';
+        document.getElementsByName('membershipCode')[0].value = '';
+        document.getElementsByName('fullName')[0].value = '';
+        document.getElementsByName('phoneNumber')[0].value = '';
+        document.getElementsByName('address')[0].value = '';
+        document.getElementsByName('dateOfBirth')[0].value = '';
+        document.getElementsByName('joinDate')[0].value = '';
+        document.getElementsByName('email')[0].value = '';
+        document.getElementsByName('roleId')[0].value = '';
+
+        // Redirect to clear query string
+        window.location.href = '@Url.Action("Index", "Member")';
+    }
+
+    // Initialize date pickers for dateOfBirth and joinDate
+    flatpickr("input[name='dateOfBirth']", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    flatpickr("input[name='joinDate']", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+</script>

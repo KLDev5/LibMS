@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Library Management</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        .main-content {
+            overflow-x: overlay;
+            background: #ffffff;
+        }
+
+        body {
+            background: #e7f0f3;
+        }
+
+        .btn-primary {
+            background: #325863;
+        }
+
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Header Styling */
+        .header {
+            background: #325863;
+            color: white;
+            text-align: end;
+            font-size: 24px;
+            padding: 17px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            font-weight: bold;
+        }
+
+        .header a {
+            color: #ffffff;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 66px; /* Below header */
+            left: -250px; /* Hidden by default */
+            background: #213b43;
+            padding-top: 20px;
+            transition: left 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            font-size: 16px; /* Adjusted for better readability */
+            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            font-weight: 500; /* Medium weight for a modern look */
+            color: white; /* Keeps text white */
+            transition: background 0.3s ease, color 0.3s ease; /* Smooth hover effect */
+        }
+
+        .sidebar a i {
+            margin-right: 12px; /* Adjusted spacing for better alignment */
+            font-size: 18px; /* Ensures the icon is well-sized */
+        }
+
+        /* Hover Effect */
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2); /* Subtle hover effect */
+            color: #f0f0f0; /* Slightly lighter text on hover */
+        }
+
+        /* Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #fff;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 1100;
+        }
+
+        /* Show Sidebar */
+        .sidebar.active {
+            left: 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px; /* Below header */
+            padding: 20px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.shifted {
+            margin-left: 260px;
+        }
+
+        /* Submenu */
+        .submenu {
+            display: none;
+            padding-left: 20px;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+        }
+
+        .submenu a {
+            font-size: 14px;
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <a href="@Url.Action("Logout", "Login")">
+        <i class="fas fa-sign-out-alt"></i>
+    </a>
+</div>
+
+<!-- Toggle Button -->
+<button class="menu-toggle" onclick="toggleMenu()">☰</button>
+@{
+    string userRole = Session["UserRole"].ToString();
+    long userid = Convert.ToInt64(Session["UserId"].ToString());
+}
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h2 style="color:white; text-align:center;">Library</h2>
+    @{
+        if (Convert.ToInt64(userRole.ToString()) == 3)
+        {
+            <a href="@Url.Action("Index", "Home")" class="nav-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+
+            <a href="@Url.Action("Index", "Member")" class="nav-link">
+                <i class="fas fa-users"></i> Member Details
+            </a>
+
+            <a href="@Url.Action("ChangePassword", "User", new { id = userid })">
+                <i class="fas fa-key"></i> Change Password
+            </a>
+
+            @* <a href="@Url.Action("BookCatalogue", "Book", new { id = userid })"> *@
+            @*     <i class="fas fa-book"></i> Request Book *@
+            @* </a> *@
+            
+            <a href="javascript:void(0)" class="nav-link dropdown-toggle" onclick="toggleSubMenu()">
+                <i class="fas fa-users"></i> Borrow Books
+            </a>
+            <div class="submenu" id="submenu">
+                <a href="@Url.Action("BookCatalogue", "Book", new { id = userid })">
+                    <i class="fas fa-book"></i> Request Book
+                </a>
+                <a href="@Url.Action("PendingRequests", "Borrow")" class="nav-link">
+                    <i class="fas fa-hourglass-half"></i> My Pending Requests
+                </a>
+                <a href="@Url.Action("ApprovedBorrowedRecords", "Borrow")" class="nav-link">
+                    <i class="fas fa-hourglass-half"></i> See Borrowed/Approved Request
+                </a>
+                <a href="@Url.Action("BorrowRecordHistory", "Borrow")" class="nav-link">
+                    <i class="fas fa-sync-alt"></i> Borrow Record History
+                </a>
+            </div>
+
+            <a href="@Url.Action("Logout", "Login")" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+        }
+
+        if (Convert.ToInt64(userRole.ToString()) == 2)
+        {
+            <a href="@Url.Action("Index", "Home")" class="nav-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+
+            <a href="@Url.Action("Index", "Book")" class="nav-link">
+                <i class="fas fa-book"></i> Book
+            </a>
+
+            <a href="@Url.Action("Index", "User")" class="nav-link">
+                <i class="fas fa-user"></i> User
+            </a>
+
+            <a href="@Url.Action("Index", "Member")" class="nav-link">
+                <i class="fas fa-users"></i> Manage Members
+            </a>
+            
+            <a href="javascript:void(0)" class="nav-link dropdown-toggle" onclick="toggleSubMenu()">
+                <i class="fas fa-users"></i> Borrow Books
+            </a>
+            <div class="submenu" id="submenu">
+                <a href="@Url.Action("BookCatalogue", "Book", new { id = userid })">
+                    <i class="fas fa-book"></i> Request Book
+                </a>
+                <a href="@Url.Action("PendingRequests", "Borrow")" class="nav-link">
+                    <i class="fas fa-hourglass-half"></i> Approve Pending Requests
+                </a>
+
+                <a href="@Url.Action("ApprovedBorrowedRecords", "Borrow")" class="nav-link">
+                    <i class="fas fa-hourglass-half"></i> See Borrowed/Approved Request
+                </a>
+                <a href="@Url.Action("BorrowRecordHistory", "Borrow")" class="nav-link">
+                    <i class="fas fa-sync-alt"></i> Borrow Record History
+                </a>
+            </div>
+
+           
+
+            <a href="@Url.Action("Logout", "Login")" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+        }
+
+        if (Convert.ToInt64(userRole.ToString()) == 1)
+        {
+            <a href="@Url.Action("Index", "Home")" class="nav-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+
+            <a href="@Url.Action("Index", "Book")" class="nav-link">
+                <i class="fas fa-book"></i> Book
+            </a>
+
+            <a href="@Url.Action("Index", "User")" class="nav-link">
+                <i class="fas fa-user"></i> User
+            </a>
+            
+            <a href="@Url.Action("Index", "Member")" class="nav-link">
+                <i class="fas fa-users"></i> View Members
+            </a>
+            <!-- Submenu for Manage Members -->
+            <a href="javascript:void(0)" class="nav-link dropdown-toggle" onclick="toggleSubMenu()">
+                <i class="fas fa-users"></i> Borrow Books
+            </a>
+            <div class="submenu" id="submenu">
+                <a href="@Url.Action("BookCatalogue", "Book", new { id = userid })">
+                    <i class="fas fa-book"></i> Request Book
+                </a>
+                <a href="@Url.Action("PendingRequests", "Borrow")" class="nav-link">
+                    <i class="fas fa-hourglass-half"></i> Approve Pending Requests
+                </a>
+                <a href="@Url.Action("ApprovedBorrowedRecords", "Borrow")" class="nav-link">
+                    <i class="fas fa-hourglass-half"></i> See Borrowed/Approved Request
+                </a>
+
+                <a href="@Url.Action("BorrowRecordHistory", "Borrow")" class="nav-link">
+                    <i class="fas fa-sync-alt"></i> Borrow Record History
+                </a>
+            </div>
+            
+            
+           
+
+            <a href="@Url.Action("Logout", "Login")" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+        }
+    }
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="main-content">
+    @RenderBody()
+    <hr/>
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Library Management System</p>
+    </footer>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@RenderSection("scripts", required: false)
+
+<!-- FontAwesome for Icons -->
+<script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+
+<!-- Toggle Sidebar Script -->
+<script>
+    function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("main-content").classList.toggle("shifted");
+    }
+
+    function toggleSubMenu() {
+        var submenu = document.getElementById("submenu");
+        submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+    }
+</script>
+
+<!-- JS: CLIENT-SIDE PAGINATION -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itemsPerPage = 4;
+        const items = document.querySelectorAll(".record-item");
+        const totalPages = Math.ceil(items.length / itemsPerPage);
+        const paginationControls = document.getElementById("pagination-controls");
+        let currentPage = 1;
+        const maxVisiblePages = 5;
+
+        function showPage(page) {
+            currentPage = page;
+            items.forEach((item, index) => {
+                item.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? "table-row" : "none";
+            });
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            let html = '<ul class="pagination">';
+
+            // Previous button
+            if (currentPage > 1) {
+                html += `<li class="page-item"><a href="#" class="page-link" data-page="${currentPage - 1}">« Prev</a></li>`;
+            }
+
+            // Calculate start and end page numbers
+            let startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
+            let endPage = startPage + maxVisiblePages - 1;
+            if (endPage > totalPages) {
+                endPage = totalPages;
+                startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a href="#" class="page-link" data-page="${i}">${i}</a>
+                         </li>`;
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                html += `<li class="page-item"><a href="#" class="page-link" data-page="${currentPage + 1}">Next »</a></li>`;
+            }
+
+            html += '</ul>';
+            paginationControls.innerHTML = html;
+
+            document.querySelectorAll(".page-link").forEach(link => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const page = parseInt(this.dataset.page);
+                    showPage(page);
+                });
+            });
+        }
+
+        // Initial load
+        showPage(1);
+    });
+</script>
+<style>
+    .pagination {
+        display: flex;
+        list-style-type: none;
+        padding-left: 0;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+    .pagination .page-link {
+        padding: 6px 12px;
+        background: #f1f1f1;
+        border-radius: 4px;
+        color: #333;
+        text-decoration: none;
+    }
+    .pagination .active .page-link {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
+
+
+</body>
+</html>

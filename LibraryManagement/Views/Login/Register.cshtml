@@ -1,0 +1,48 @@
+@model LibraryManagement.Models.Register
+
+@{
+    Layout="~/Views/Shared/LoginLayout.cshtml"; // Disable main layout for login page
+}
+
+@{
+    ViewBag.Title = "Login";
+}
+
+
+@using (Html.BeginForm("Register", "Login", FormMethod.Post ,new { @class = "login" }))
+{
+    if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+    {
+        <div class="alert alert-success">
+            @ViewBag.SuccessMessage
+        </div>
+    }
+    @Html.AntiForgeryToken()
+    <h2>SD Library Management System</h2>
+    <p>Please log in</p>
+    @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Email" })
+    @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+
+    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Email" })
+    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+
+    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Password" })
+    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+
+    @Html.PasswordFor(model => model.VerifyPassword, new { @class = "form-control", placeholder = "Password" })
+    @Html.ValidationMessageFor(model => model.VerifyPassword, "", new { @class = "text-danger" })
+
+    <input type="submit" value="Register"/>
+
+    <div class="links">
+        @* <a href="@Url.Action("ForgotPassword", "Account")">Forgot password</a> *@
+        <a href="@Url.Action("Login", "Login")">Back to Login </a>
+    </div>
+
+    if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <p style="color: #212d68; text-align: center;">@ViewBag.ErrorMessage</p>
+    }
+}
+
+

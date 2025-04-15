@@ -1,0 +1,189 @@
+@model LibraryManagement.Models.Member
+
+@{
+    ViewBag.Title = "Edit Member Details";
+}
+@{
+    
+    var user = ViewBag.User as LibraryManagement.Models.User; //viewbag for status name
+    // var roles = ViewBag.Roles as List<LibraryManagement.Models.Role>;
+
+    if (user != null)
+    {
+        <h2>Edit Member @user.FullName </h2>
+    }
+    else
+    {
+        <h2>Edit Member  </h2>
+
+    }
+}
+<h3>Membership Code: @Model.MembershipCode </h3>
+
+@using (Html.BeginForm("Edit", "Member", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @Html.HiddenFor(model => model.MemberId) <!-- Hidden field for Book ID -->
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(Model => Model.DateOfBirth, "{0:yyyy-MM-dd}", new { @class = "form-control", @type = "date" })
+
+                @* @Html.TextBoxFor(model => model.DateOfBirth, new { @class = "form-control", type = "date", value = Model.DateOfBirth?.ToString("yyyy-MM-dd") ?? "" }) *@
+                @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.JoinDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(Model => Model.JoinDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @type = "date" ,@readonly="readonly"})
+                @* @Html.TextBoxFor(model => model.JoinDate, new { @class = "form-control",type = "date",  *@
+                @*     value = Model.JoinDate.HasValue ? Model.JoinDate.Value.ToString("yyyy-MM-dd") : "" ,@readonly="readonly",autocomplete = "off"  }) *@
+                @Html.ValidationMessageFor(model => model.JoinDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        @{
+            if (Session["UserRole"].ToString() == "3")
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.TotalBooksBorrowed, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.TotalBooksBorrowed, new { @class = "form-control", @readonly = "readonly" ,type="number"})
+                        @Html.ValidationMessageFor(model => model.TotalBooksBorrowed, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.TotalBooksBorrowed, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.TotalBooksBorrowed, new { @class = "form-control" ,type="number"} )
+                        @Html.ValidationMessageFor(model => model.TotalBooksBorrowed, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            }
+        }
+        <div class="form-group">
+            @Html.LabelFor(model => model.OverdueCount, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.OverdueCount, new { @class = "form-control" ,@readonly="readonly",type="number" })
+                @Html.ValidationMessageFor(model => model.OverdueCount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        @{
+            if (Session["UserRole"].ToString() == "3")
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OverdueLimit, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.OverdueLimit, new { @class = "form-control", @readonly = "readonly" ,type="number"})
+                        @Html.ValidationMessageFor(model => model.OverdueLimit, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OverdueLimit, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.OverdueLimit, new { @class = "form-control" ,type="number"} )
+                        @Html.ValidationMessageFor(model => model.OverdueLimit, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                
+            }
+        }
+
+        @{
+        if (Session["UserRole"].ToString() != "3")
+        {    
+      <div class="form-group">
+            @Html.LabelFor(model => model.ExpiryDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(Model => Model.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @type = "date"})
+
+                @* @Html.TextBoxFor(model => model.ExpiryDate, new { @class = "form-control", Type = "datetime-local" }) *@
+                @Html.ValidationMessageFor(model => model.ExpiryDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        
+      @* <div class="form-group"> *@
+      @*               @Html.LabelFor(model => model.TotalBooksBorrowed, htmlAttributes: new { @class = "control-label col-md-2" }) *@
+      @*               <div class="col-md-10"> *@
+      @*                   @Html.TextBoxFor(model => model.TotalBooksBorrowed, new { @class = "form-control",type="number" }) *@
+      @*                   @Html.ValidationMessageFor(model => model.TotalBooksBorrowed, "", new { @class = "text-danger" }) *@
+      @*               </div> *@
+      @*           </div> *@
+      <div class="form-group">
+                    @Html.LabelFor(model => model.OutstandingFines, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.OutstandingFines, new { @class = "form-control" ,type="number",step = "any" })
+                        @Html.ValidationMessageFor(model => model.OutstandingFines, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                
+  } 
+        }
+        
+
+
+        
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save Changes" class="btn btn-primary" />
+            </div>
+
+            @* <div class="col-md-offset-2 col-md-10"> *@
+            @*     @Html.ActionLink("Change Password", "ChangePassword",new { id = Model.UserId }) *@
+            @* </div> *@
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+

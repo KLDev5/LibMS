@@ -1,0 +1,139 @@
+@model PagedList.IPagedList<LibraryManagement.Models.User>
+@using PagedList.Mvc;
+
+
+@{
+    ViewBag.Title = "All Users";
+}
+
+<h2>All User List</h2>
+@{
+    var Roles = ViewBag.Roles as List<LibraryManagement.Models.Role>;//viewbag for status name
+    var RolesList = ViewBag.RolesList;
+}
+
+
+<div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px">
+    @using (Html.BeginForm("GetAll", "User", FormMethod.Get))
+    {
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchUserId" name="searchUserId" placeholder="Search by UserId..." />
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchFullName" name="searchFullName" placeholder="Search by FullName..." />
+
+        </div>
+
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchEmail" name="searchEmail" placeholder="Search by Email..." />
+
+        </div>
+        if (Convert.ToInt64(Session["UserRole"]) == 1)
+        {
+            <div class="col-md-3">
+                <select class="form-control" id="SearchRoleID" name="SearchRoleID">
+                    <option value="">-- Select Role --</option>
+                    @foreach (var item in RolesList)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="col-md-1">
+            <select class="form-control" id="isDeleted" name="isDeleted">
+                <option value=""> -Filter Deleted/ Not Deleted-</option>
+                
+                <option value="1">Deleted</option>
+                <option value="0">Not Deleted</option>
+
+
+            </select>
+            
+        </div>
+
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary">Go</button>
+
+        </div>
+        <div class="col-md-1">
+
+            <button class="btn btn-primary" onclick="clearFilters()">Clear</button>
+
+
+        </div>
+
+
+    }
+
+
+
+</div>
+
+<table class="table">
+    <tr>
+        <th>User ID</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Password(Encrypted)</th>
+        <th>Roles</th>
+        <th>Deleted Status</th>
+        <th></th>
+        
+
+    </tr>
+    
+    @foreach (var user in Model)
+    {
+
+        <tr>
+            <td>@user.UserId</td>
+            <td>@user.FullName</td>
+            <td>@user.Email</td>
+            <td>@user.PasswordHash</td>
+            <td>
+                @{
+                    var role = Roles?.FirstOrDefault(c => c.RoleId == user.RoleId);
+                    @(role != null ? role.RoleName : "NaN") ;
+
+                }
+            </td>
+            <td>
+                
+                @(user.IsDeleted==false? "Not Deleted":"Deleted" )
+                
+                @* <span class="btn btn-warning">@Html.ActionLink("Edit", "Edit", new { id = book.BookId })</span> | *@
+                @* <span class="btn btn-danger"> @Html.ActionLink("Permanent Delete", "Delete", new { id = book.BookId })</span> *@
+            </td>
+            <td>
+                @* @book.BookId *@
+                @if (user.IsDeleted == true)
+                {
+                    using (Html.BeginForm("Undelete", "User", FormMethod.Post))
+                    {
+
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("Id", user.UserId)
+                        <input type="Submit" value="Undelete" class="btn btn-warning"/>
+                    }
+
+                }
+            </td>
+        </tr>
+    }
+</table>
+<div class="pagination-container">
+    @Html.PagedListPager(Model, page => Url.Action("GetAll", new { page }))
+</div>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}

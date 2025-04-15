@@ -1,0 +1,58 @@
+@model LibraryManagement.Models.Book
+
+@{
+    ViewBag.Title = "Extract Bulk Book Data";
+}
+
+<h2>Extract Bulk Book Data from csv</h2>
+<h3>Format of the csv must be like this example: </h3>
+<h4>Title,Author,Publisher,ISBN,PublishedDate</h4>
+<h4>The Great Gatsby,F. Scott Fitzgerald,Scribner,9780743273565,1925-04-10</h4>
+
+@using (Html.BeginForm("ExtractBookBulk", "Book", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @* @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" }) *@
+            <div class="col-md-10">
+           
+                    <div class="form-group">
+                        <label for="file">Select CSV File:</label>
+                        <input type="file" name="file" class="form-control" accept=".csv" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Upload CSV</button>
+                
+                @* @Html.TextBoxFor(model => model.Title, new { @class = "form-control" }) *@
+                @* @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" }) *@
+            </div>
+        </div>
+
+     
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

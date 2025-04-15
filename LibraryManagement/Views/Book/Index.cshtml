@@ -1,0 +1,145 @@
+@model List<LibraryManagement.Models.Book>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Books Catalogue";
+}
+
+<h2>Book List</h2>
+@{
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>;
+    var statusList = ViewBag.statusList;
+}
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<div class="row d-flex gap-2 align-items-end" style="padding-bottom: 10px; margin-left: 2px">
+    @using (Html.BeginForm("Index", "Book", FormMethod.Get))
+    {
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchTitle" name="searchTitle" placeholder="Search by title..." />
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchAuthor" name="searchAuthor" placeholder="Search by Author..." />
+            
+        </div>
+        
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="searchPublisher" name="searchPublisher" placeholder="Search by Publisher..." />
+            
+        </div>
+        <div class="col-md-3">
+            <select class="form-control" id="searchStatus" name="BookStatus">
+                <option value="">-- Select Status --</option>
+                @foreach (var item in statusList as SelectList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary">Go</button>
+
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary" onclick="clearFilters()">Clear</button>
+
+            @* <a href="@Url.Action("Index", "Book")" class="btn btn-primary">Clear</a> *@
+
+
+        </div>
+
+
+            }
+
+
+
+        </div>
+<div class="row d-flex gap-2 align-items-center" style="padding-bottom: 10px">
+    <!-- First Section: DeleteAll & ExtractBulkBooks -->
+    <div class="col-md-1">
+        @using (Html.BeginForm("DeleteAll", "Book", FormMethod.Post, new { @class = "m-0" }))
+        {
+            @Html.AntiForgeryToken()
+            <input type="submit" value="DeleteAll" class="btn btn-danger"/>
+        }
+
+        
+    </div>
+
+    <!-- Empty Space -->
+    <div class="col-md-2">
+        
+        <span class="btn btn-warning">
+            @Html.ActionLink("ExtractBulkBooks", "ExtractBookBulk")
+        </span>
+    </div>
+
+    <!-- Second Section: GetAll -->
+    <div class="col-md- ">
+        <span class="btn btn-success">
+            @Html.ActionLink("GetAll", "GetAll")
+        </span>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Book ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Published Year</th>
+        <th>Book Status</th>
+        <th></th>
+    </tr>
+    
+   
+    @foreach (var book in Model)
+    {
+
+        <tr class="record-item">
+            <td>@book.BookId</td>
+            <td>@book.Title</td>
+            <td>@book.Author</td>
+            <td>@book.PublishedDate</td>
+            <td>
+                @{
+                    var status = statuses?.FirstOrDefault(c => c.BookStatusID == book.BookStatusID);
+                    @(status != null ? status.BookStatusName : "No Status")
+                    ;
+
+                }
+            </td>
+            <td>
+                <span class="btn btn-warning">@Html.ActionLink("Edit", "Edit", new { id = book.BookId })</span> |
+                <span class="btn btn-success">@Html.ActionLink("Details", "Details", new { id = book.BookId })</span> |
+                <span class="btn btn-danger"> @Html.ActionLink("Delete", "Delete", new { id = book.BookId })</span>
+            </td>
+        </tr>
+    }
+</table>
+<div class="pagination-container" id="pagination-controls"></div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<script>
+function clearFilters() {
+document.getElementById("searchUserId").value = "";
+document.getElementById("searchFullName").value = "";
+document.getElementById("searchEmail").value = "";
+const roleDropdown = document.getElementById("SearchRoleID");
+if (roleDropdown) {
+roleDropdown.selectedIndex = 0;
+}
+window.location.href = '@Url.Action("Index", "User")';
+}
+</script>

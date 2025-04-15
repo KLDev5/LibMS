@@ -1,0 +1,91 @@
+@using LibraryManagement.Models
+@model LibraryManagement.Models.BorrowRecord
+
+@{
+    ViewBag.Title = "Return Confirm";
+    var RecordDetails = ViewBag.RecordDetails as ApprovedBorrowedRecordsViewModel;
+}
+
+<h2>Return Confirm</h2>
+
+<h3>Return of the Book Titled @RecordDetails.Book</h3>
+@{
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>; //viewbag for status name
+}
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Borrow Id</dt>
+        <dd>@Model.BorrowId</dd>
+
+        <dt>Borrower Membership Code</dt>
+        <dd>@RecordDetails.BorrowerMembershipCode</dd>
+
+        <dt>Borrower Name</dt>
+        <dd>@RecordDetails.BorrowerName</dd>
+
+        <dt>Approver Membership Code</dt>
+        <dd>@RecordDetails.ApproverMembershipCode</dd>
+
+        <dt>Approver Name</dt>
+        <dd>@RecordDetails.ApproverName</dd>
+
+        <dt>Book</dt>
+        <dd>@RecordDetails.Book</dd>
+
+        <dt>Borrow Date</dt>
+        @* <dd>@Model.BorrowDate?.Date.ToString("yyyy-MM-dd")</dd> *@
+        <dd>@(Model.BorrowDate.HasValue ? Model.BorrowDate.Value.ToString("yyyy-MM-dd") : "Not Available")</dd>
+
+
+        <dt>Scheduled Return Date</dt>
+        @* <dd>@Model.ScheduledReturnDate?.Date.ToString("yyyy-MM-dd")</dd> *@
+        <dd>@(Model.ScheduledReturnDate.HasValue ? Model.ScheduledReturnDate.Value.ToString("yyyy-MM-dd") : "Not Available")</dd>
+
+
+        <dt>Actual Return Date</dt>
+        <dd>@(Model.ActualReturnDate.HasValue ? Model.ActualReturnDate.Value.ToString("yyyy-MM-dd") : "Not Returned")</dd>
+
+        <dt>Overdue Status</dt>
+        <dd>@(Model.OverdueStatus ? "Overdue" : "Not Overdue")</dd>
+
+        <dt>Overdue Amount</dt>
+        <dd>@(Model.OverdueAmount.HasValue ? Model.OverdueAmount.Value.ToString("C") : "N/A")</dd>
+
+        @* <dt>Book Status</dt> *@
+        @* <dd> *@
+        @*     @{ *@
+        @*         var status = statuses?.FirstOrDefault(c => c.BookStatusID == Model.BookStatusID); *@
+        @*         @(status != null ? status.BookStatusName : "No Status"); *@
+        @*     } *@
+        @* </dd> *@
+    </dl>
+
+
+    @using (Html.BeginForm("Return", "Borrow", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m=>@Model.BorrowId)
+        @Html.HiddenFor(m => @Model.ScheduledReturnDate)
+        @Html.HiddenFor(m => @Model.ActualReturnDate)
+        @Html.HiddenFor(m => @Model.OverdueStatus)
+        @Html.HiddenFor(m => @Model.OverdueAmount)
+        @Html.HiddenFor(m => @Model.BorrowStatusId)
+        @Html.HiddenFor(m => @Model.BookId)
+
+    
+    
+        <input type="submit" value="Return" class="btn btn-danger" />
+        @Html.ActionLink("Cancel", "ApprovedBorrowedRecords", null, new { @class = "btn btn-secondary" })
+    }
+</div>
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

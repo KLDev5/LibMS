@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<style>
+    .jumbotron
+    {
+        background: none;
+    }
+</style>
+<div class="jumbotron">
+    <h1>Library Management System</h1>
+    <p class="lead">Best App for Managing Library and Book Stocks</p>
+    <p>
+        @* <a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a> *@
+    </p>
+</div>
+
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}

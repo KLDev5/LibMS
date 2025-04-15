@@ -1,0 +1,95 @@
+@model LibraryManagement.Models.Book
+
+@{
+    ViewBag.Title = "Request Book";
+}
+
+<h2>Book Details</h2>
+
+<h3>Description of the Book Titled @Model.Title</h3>
+@{
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>; //viewbag for status name
+}
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Title</dt>
+        <dd>@Model.Title</dd>
+
+        <dt>Author</dt>
+        <dd>@Model.Author</dd>
+
+        <dt>Year</dt>
+        <dd>@Model.Publisher</dd>
+
+        <dt>Author</dt>
+        <dd>@Model.ISBN</dd>
+
+        <dt>Year</dt>
+        <dd>@Model.PublishedDate</dd>
+        
+        <dt>Book Status</dt>
+        <dd>
+            @{
+                var status = statuses?.FirstOrDefault(c => c.BookStatusID == Model.BookStatusID);
+                @(status != null ? status.BookStatusName : "No Status");
+            }
+        </dd>
+    </dl>
+    @if (string.IsNullOrEmpty(ViewBag.AlreadyRequested))
+    {
+        using (Html.BeginForm("Request", "Borrow", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @* @Html.HiddenFor(Model => Model.BookId) *@
+            <input type="hidden" name="id" value="@Model.BookId" /> 
+
+            <input type="submit" value="Request" class="btn btn-danger" />
+            <a href="@Url.Action("Index", "Home")" class="btn btn-warning">Back to Home</a>
+        }
+
+    }
+    else
+    {
+        @* using (Html.BeginForm("Request", "Borrow", FormMethod.Post)) *@
+        @* { *@
+        @*     @Html.AntiForgeryToken() *@
+        @*     $1$ @Html.HiddenFor(Model => Model.BookId) #1# *@
+        @*     <input type="hidden" name="id" value="@Model.BookId" />  *@
+
+            @* <input type="submit" value="Request" class="btn btn-danger"  readonly="readonly"/> *@
+            <span class="btn btn-success">Already Requested</span>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-warning">Back to Home</a>
+        // }
+        
+    }
+
+    
+
+    @* @using (Html.BeginForm("Delete", "Book", FormMethod.Post)) *@
+    @* { *@
+    @*     @Html.AntiForgeryToken() *@
+    @*     @Html.HiddenFor(model => model.BookId) *@
+    @* *@
+    @*     <input type="submit" value="Delete" class="btn btn-danger" /> *@
+    @*     @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" }) *@
+    @* } *@
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

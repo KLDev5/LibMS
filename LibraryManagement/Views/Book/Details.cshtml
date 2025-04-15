@@ -1,0 +1,64 @@
+@model LibraryManagement.Models.Book
+
+@{
+    ViewBag.Title = "Book Details";
+}
+
+<h2>Book Details</h2>
+
+<h3>Description of the Book Titled @Model.Title</h3>
+@{
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>; //viewbag for status name
+}
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Title</dt>
+        <dd>@Model.Title</dd>
+
+        <dt>Author</dt>
+        <dd>@Model.Author</dd>
+
+        <dt>Year</dt>
+        <dd>@Model.Publisher</dd>
+
+        <dt>Author</dt>
+        <dd>@Model.ISBN</dd>
+
+        <dt>Year</dt>
+        <dd>@Model.PublishedDate</dd>
+        
+        <dt>Book Status</dt>
+        <dd>
+            @{
+                var status = statuses?.FirstOrDefault(c => c.BookStatusID == Model.BookStatusID);
+                @(status != null ? status.BookStatusName : "No Status");
+            }
+        </dd>
+    </dl>
+
+    @* @using (Html.BeginForm("Delete", "Book", FormMethod.Post)) *@
+    @* { *@
+    @*     @Html.AntiForgeryToken() *@
+    @*     @Html.HiddenFor(model => model.BookId) *@
+    @* *@
+    @*     <input type="submit" value="Delete" class="btn btn-danger" /> *@
+    @*     @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" }) *@
+    @* } *@
+</div>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,53 @@
+@model LibraryManagement.Models.Login
+
+@{
+    Layout="~/Views/Shared/LoginLayout.cshtml"; // Disable main layout for login page
+}
+
+@{
+    ViewBag.Title = "Login";
+}
+
+@using (Html.BeginForm("Login", "Login", FormMethod.Post ,new { @class = "login" }))
+{
+    if (TempData["SuccessMessage"]!=null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @Html.AntiForgeryToken()
+    <h2>Library Management System</h2>
+    <p>Please log in</p>
+
+    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Email" })
+    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Password" })
+
+    <input type="submit" value="Log In"/>
+
+    <div class="links">
+        @* <a href="@Url.Action("ForgotPassword", "Account")">Forgot password</a> *@
+        <a href="@Url.Action("Register", "Login")">Register</a>
+    </div>
+
+    @* if (!string.IsNullOrEmpty(ViewBag.ErrorMessage)) *@
+    @* { *@
+    @*     <p style="color: #212d68; text-align: center;">@ViewBag.ErrorMessage</p> *@
+    @* } *@
+    if (TempData["ErrorMessage"] != null)
+    {
+        <p style="color: #212d68; text-align: center;">@TempData["ErrorMessage"]</p>
+        @* <div class="alert alert-danger"> *@
+        @*     @TempData["ErrorMessage"] *@
+        @* </div> *@
+    }
+    if (TempData["SuccessMessage"] != null)
+    {
+        <p style="color: #212d68; text-align: center;">@TempData["SuccessMessage"]</p>
+        @* <div class="alert alert-success"> *@
+        @*     @TempData["SuccessMessage"] *@
+        @* </div> *@
+    }
+}
+
+

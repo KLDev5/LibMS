@@ -1,0 +1,86 @@
+ @model LibraryManagement.Models.Member
+
+@{
+    ViewBag.Title = "Book Details";
+}
+
+<h2>Member Details</h2>
+
+<h3>Member Details: @Model.MembershipCode</h3>
+@{
+    var user = ViewBag.User as LibraryManagement.Models.User; //viewbag for status name
+    
+
+    var roles = ViewBag.Roles as List<LibraryManagement.Models.Role>;
+}
+ <div>
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Member Name</dt>
+        <dd>@user.FullName</dd>
+
+        <dt>Membership Code</dt>
+        <dd>@Model.MembershipCode</dd>
+
+        <dt>Phone Number</dt>
+        <dd>@(Model.PhoneNumber ?? "N/A")</dd>
+
+        <dt>Address</dt>
+        <dd>@(Model.Address??"N/A")</dd>
+
+        <dt>Join Date</dt>
+        <dd>@(Model.JoinDate?.ToString("yyyy-MM-dd") ?? "N/A")</dd>
+        
+        <dt>Expiry Date</dt>
+        <dd>@(Model.ExpiryDate?.ToString("yyyy-MM-dd") ?? "N/A")</dd>
+        
+        <dt>Total Books Borrowed</dt>
+        <dd>@(Model.TotalBooksBorrowed?.ToString() ?? "N/A")</dd>
+        
+        <dt>Outstanding Fines</dt>
+        <dd>@(Model.OutstandingFines?.ToString() ?? "N/A")</dd>
+
+        <dt>Role</dt>
+        <dd>
+            @{
+                var role = roles?.FirstOrDefault(c => c.RoleId == user.RoleId);
+                @(role != null ? role.RoleName : "Not Assigned");
+            }
+        </dd>
+        <dt>Books Borrowed</dt>
+        <dd>@(Model.TotalBooksBorrowed?.ToString() ?? "N/A")</dd>
+        <dt>Overdue Count</dt>
+        <dd>@(Model.OverdueCount?.ToString() ?? "N/A")</dd>
+        <dt>Overdue Limit</dt>
+        <dd>@(Model.OverdueLimit?.ToString() ?? "N/A")</dd>
+        
+    </dl>
+
+    @* @using (Html.BeginForm("Delete", "Book", FormMethod.Post)) *@
+    @* { *@
+    @*     @Html.AntiForgeryToken() *@
+    @*     @Html.HiddenFor(model => model.BookId) *@
+    @* *@
+    @*     <input type="submit" value="Delete" class="btn btn-danger" /> *@
+    @*     @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" }) *@
+    @* } *@
+</div>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
