@@ -226,18 +226,55 @@ namespace LibraryManagement.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "BookId,Title,Author,Publisher,ISBN,PublishedDate,BookStatusID")] Book book)
+        public ActionResult Edit([Bind(Include = "BookId,Title,Author,Publisher,ISBN,PublishedDate,BookStatusID")] Book book,HttpPostedFileBase imageFile)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    
+                    
+
+                    if (imageFile != null && imageFile.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileName(imageFile.FileName);
+                        string fileextension = Path.GetExtension(imageFile.FileName);
+                        if (fileextension == ".jpg" || fileextension == ".jpeg" || fileextension == ".png")
+                        {
+                            string relativepath=ConfigurationManager.AppSettings["BookImageUploadPath"] + "Book_"+Guid.NewGuid() + fileextension;
+                            string SavePath = Server.MapPath(relativepath);
+                            imageFile.SaveAs(SavePath);
+                            book.BookImage = relativepath;
+
+                        }
+                        else
+                        {
+                            throw new FileFormatException("Image file format is not supported.");
+                        }
+                        
+
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException();
+                    }
                     db.Entry(book).State = System.Data.Entity.EntityState.Modified;
                     db.SaveChanges();
 
                 }
+
                 TempData["SuccessMessage"] = "Book Data Updated Successfully";
                 return RedirectToAction("Index");
+            }
+            catch (FileFormatException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message; 
+                return View(book);
+            }
+            catch (FileNotFoundException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message; 
+                return View(book);
             }
             catch (Exception ex)
             {

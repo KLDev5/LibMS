@@ -185,6 +185,9 @@ namespace LibraryManagement.Controllers
         {
             try
             {
+                long userid = Convert.ToInt64(Session["UserId"].ToString());
+                Member member = db.Members.FirstOrDefault(m => m.UserId == userid);
+
                 if (id == null) throw new BorrowRecordsExceptions.BorrowRecordNotFoundExceptions();
                 
                 // LibraryConfiguration lconfig = db.LibraryConfigurations.Find(3);
@@ -208,10 +211,7 @@ namespace LibraryManagement.Controllers
                 
                 #region borrowrecord details
                 
-                long userid = Convert.ToInt64(Session["UserId"].ToString());
-                Member member = db.Members.FirstOrDefault(m => m.UserId == userid);
                 if (member == null) throw new MemberMasterExceptions.MemberNotFoundException();
-                
                 
                 BorrowRecordDetail borrowRecordDetail = new BorrowRecordDetail();
                 borrowRecordDetail.BorrowId = borrowRecord.BorrowId;
@@ -220,16 +220,21 @@ namespace LibraryManagement.Controllers
                 borrowRecordDetail.BorrowRecordDetailsDate = DateTime.Now;
                 borrowRecordDetail.ApproverMemberId = member.MemberId;
                 db.BorrowRecordDetails.Add(borrowRecordDetail);
-               
-                
                 #endregion
+                
                 #region change book status
-
                 Book book = db.Books.Find(borrowRecord.BookId);
                 if (book == null) throw new BookMasterExceptions.BookNotFoundExceptions();
                 book.BookStatusID = 2; // book status changed to borrowed
                 #endregion
                 
+                #region Member book borrow count update
+
+                Member BorrowerMember = db.Members.Find(borrowRecord.MemberId);
+                BorrowerMember.TotalBooksBorrowed= BorrowerMember.TotalBooksBorrowed != null && BorrowerMember.TotalBooksBorrowed >= 1 ? BorrowerMember.TotalBooksBorrowed + 1 : 1;
+                
+                
+                #endregion 
                 
                 db.SaveChanges();
                 // db.Books.Remove(book);
@@ -477,6 +482,9 @@ namespace LibraryManagement.Controllers
         {
             try
             {
+                long userid = Convert.ToInt64(Session["UserId"].ToString());
+                Member member = db.Members.FirstOrDefault(m => m.UserId == userid);
+
                 #region borrowrecords update
 
                 var dbborrow = db.BorrowRecords.Find(borrowRecord.BorrowId);
@@ -515,6 +523,14 @@ namespace LibraryManagement.Controllers
                 dbbook.BookStatusID = 1; //chnged to available
                 
                 #endregion
+                
+                #region Member book borrow count update
+                Member BorrowerMember = db.Members.Find(dbborrow.MemberId);
+
+                BorrowerMember.TotalBooksBorrowed= BorrowerMember.TotalBooksBorrowed != null && BorrowerMember.TotalBooksBorrowed > 0 ? BorrowerMember.TotalBooksBorrowed - 1 : 0;
+                
+                
+                #endregion 
 
                 db.SaveChanges();
                 TempData["SuccessMessage"] = "Request has been sent successfully";

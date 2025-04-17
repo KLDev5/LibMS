@@ -48,6 +48,8 @@ namespace LibraryManagement.Models
         public bool IsDeleted { get; set; } 
         public virtual User User { get; set; }  
         
+        public string MemberImage { get; set; }
+        
         // [Required]
         // [StringLength(128)]
         // [Display(Name = "Status")]
@@ -72,6 +74,7 @@ namespace LibraryManagement.Models
         
         public int? TotalBooksBorrowed { get; set; }
 
+        public string MemberImage { get; set; }
 
 
         

@@ -1,30 +1,136 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model LibraryManagement.Models.Dashboard
+
+@{
+    ViewBag.Title = "Home";
 }
+
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+
 <style>
-    .jumbotron
-    {
-        background: none;
+    body {
+        font-family: 'Varela Round', sans-serif;
+        background: linear-gradient(to right, #f8f9fa, #e9ecef);
+        margin: 0;
+        padding: 0;
+    }
+
+    .home-container {
+        padding: 40px;
+        text-align: center;
+        color: #343a40;
+    }
+
+    .home-header {
+        background: #f2f4f6;
+        padding: 40px 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        color: #31708f;
+        margin-bottom: 30px;
+    }
+
+    .home-header h1 {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .home-header p.lead {
+        font-size: 20px;
+        margin-bottom: 0;
+    }
+
+    .alert {
+        width: 60%;
+        margin: 10px auto;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 16px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .stats-card {
+        background-position: center;
+        background-size: cover;
+        /*background: #215563;*/
+        padding: 20px;
+        border-radius: 15px;
+        color: #ffffff;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-card h3 {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .stats-card p {
+        font-size: 18px;
     }
 </style>
-<div class="jumbotron">
-    <h1>Library Management System</h1>
-    <p class="lead">Best App for Managing Library and Book Stocks</p>
-    <p>
-        @* <a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a> *@
-    </p>
+
+<div class="home-container">
+    <div class="home-header">
+        <h1>Library Management System</h1>
+        <p class="lead">Best App for Managing Library and Book Stocks</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Statistics Section -->
+    <div class="stats-container">
+        <div class="stats-card" style="background-image: url('@Url.Content("~/Content/Images/cardbg1.jpg")');">
+            <h3>@Model.AvailableBooksCount</h3>
+            <p>Available Books</p>
+        </div>
+
+        <div class="stats-card" style="background-image: url('@Url.Content("~/Content/Images/cardbg2.jpg")');">
+            <h3>@Model.BorrowedBooksCount</h3>
+            <p>Total Books Borrowed</p>
+        </div>
+        @{
+            if (Session["UserRole"].ToString().Trim() == "1")
+            {
+                <div class="stats-card" style="background-image: url('@Url.Content("~/Content/Images/cardbg5.jpg")');">
+                    <h3>@Model.TotalMembersCount</h3>
+                    <p>Total Members</p>
+                </div>
+            }
+        }
+        <div class="stats-card" style="background-image: url('@Url.Content("~/Content/Images/cardbg3.jpg")');">
+            <h3>@Model.BooksOverdueCount</h3>
+            <p>Books Overdue</p>
+        </div>
+        <div class="stats-card" style="background-image: url('@Url.Content("~/Content/Images/cardbg4.jpg")');">
+            <h3>@Model.TotalBooksCount</h3>
+            <p>Total Books</p>
+        </div>
+    </div>
 </div>
-
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}

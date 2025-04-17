@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IdentityModel;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using LibraryManagement.Models;
 using LibraryManagement.ClsLib;
@@ -220,7 +223,7 @@ namespace LibraryManagement.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "MemberId,UserId,MembershipCode,PhoneNumber,Address,DateOfBirth,ExpiryDate,TotalBooksBorrowed,OutstandingFines,OverdueCount,OverdueLimit,TotalBooksBorrowed")]Member member)
+        public ActionResult Edit([Bind(Include = "MemberId,UserId,MembershipCode,PhoneNumber,Address,DateOfBirth,ExpiryDate,TotalBooksBorrowed,OutstandingFines,OverdueCount,OverdueLimit,TotalBooksBorrowed")]Member member,HttpPostedFileBase imageFile)
         {
             try
             {
@@ -246,6 +249,30 @@ namespace LibraryManagement.Controllers
                     selectedMember.OverdueCount = member.OverdueCount;
                     selectedMember.OverdueLimit = member.OverdueLimit;
                     selectedMember.TotalBooksBorrowed = member.TotalBooksBorrowed;
+                    
+                    if (imageFile != null && imageFile.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileName(imageFile.FileName);
+                        string fileextension = Path.GetExtension(imageFile.FileName);
+                        if (fileextension == ".jpg" || fileextension == ".jpeg" || fileextension == ".png")
+                        {
+                            string relativepath=ConfigurationManager.AppSettings["UserImageUploadPath"] + "Member_"+Guid.NewGuid() + fileextension;
+                            string SavePath = Server.MapPath(relativepath);
+                            imageFile.SaveAs(SavePath);
+                            selectedMember.MemberImage = relativepath;
+
+                        }
+                        else
+                        {
+                            throw new FileFormatException("Image file format is not supported.");
+                        }
+                        
+
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException();
+                    }
 
                     db.SaveChanges();
                     TempData["SuccessMessage"] = "Member Edited successfully";
@@ -262,6 +289,16 @@ namespace LibraryManagement.Controllers
                 User user = db.Users.Find(member.UserId);
                 if (user == null) throw new UserMasterExceptions.UserNotFoundException();
                 ViewBag.User = user;
+                return View(member);
+            }
+            catch (FileFormatException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message; 
+                return View(member);
+            }
+            catch (FileNotFoundException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message; 
                 return View(member);
             }
             catch (UserMasterExceptions.UserNotFoundException ex)

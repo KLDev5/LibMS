@@ -1,86 +1,99 @@
- @model LibraryManagement.Models.Member
+@using System.Configuration
+@model LibraryManagement.Models.Member
 
 @{
-    ViewBag.Title = "Book Details";
+    ViewBag.Title = "Member Details";
+    var user = ViewBag.User as LibraryManagement.Models.User;
+    var roles = ViewBag.Roles as List<LibraryManagement.Models.Role>;
 }
 
 <h2>Member Details</h2>
+<h3>Member Code: @Model.MembershipCode</h3>
 
-<h3>Member Details: @Model.MembershipCode</h3>
-@{
-    var user = ViewBag.User as LibraryManagement.Models.User; //viewbag for status name
-    
-
-    var roles = ViewBag.Roles as List<LibraryManagement.Models.Role>;
-}
- <div>
-
+<div class="container">
     <hr />
-    <dl class="dl-horizontal">
-        <dt>Member Name</dt>
-        <dd>@user.FullName</dd>
+    <div class="row">
+        <!-- Profile Image -->
+        <div class="col-md-3">
+            <div class="card profile-card mb-4">
+                <img class="card-img-top" src="@Url.Content(!string.IsNullOrEmpty(Model.MemberImage) ? Model.MemberImage : ConfigurationManager.AppSettings["ImageNoPreviewPath"])" alt="Preview Not Available" />
+            </div>
+        </div>
 
-        <dt>Membership Code</dt>
-        <dd>@Model.MembershipCode</dd>
+        <!-- Member Details in 3 Columns -->
+        <div class="col-md-9">
+            <div class="row">
+                <!-- Column 1 -->
+                <div class="col-md-4">
+                    <p><strong>Member Name:</strong><br /> @user.FullName</p>
+                    <p><strong>Membership Code:</strong><br /> @Model.MembershipCode</p>
+                    <p><strong>Phone Number:</strong><br /> @(Model.PhoneNumber ?? "N/A")</p>
+                    <p><strong>Address:</strong><br /> @(Model.Address ?? "N/A")</p>
+                </div>
 
-        <dt>Phone Number</dt>
-        <dd>@(Model.PhoneNumber ?? "N/A")</dd>
+                <!-- Column 2 -->
+                <div class="col-md-4">
+                    <p><strong>Join Date:</strong><br /> @(Model.JoinDate?.ToString("yyyy-MM-dd") ?? "N/A")</p>
+                    <p><strong>Expiry Date:</strong><br /> @(Model.ExpiryDate?.ToString("yyyy-MM-dd") ?? "N/A")</p>
+                    <p><strong>Outstanding Fines:</strong><br /> @(Model.OutstandingFines?.ToString() ?? "N/A")</p>
+                    <p><strong>Role:</strong><br /> @(roles?.FirstOrDefault(r => r.RoleId == user.RoleId)?.RoleName ?? "Not Assigned")</p>
+                </div>
 
-        <dt>Address</dt>
-        <dd>@(Model.Address??"N/A")</dd>
+                <!-- Column 3 -->
+                <div class="col-md-4">
+                    <p><strong>Total Books Borrowed:</strong><br /> @(Model.TotalBooksBorrowed?.ToString() ?? "N/A")</p>
+                    <p><strong>Books Borrowed:</strong><br /> @(Model.TotalBooksBorrowed?.ToString() ?? "N/A")</p>
+                    <p><strong>Overdue Count:</strong><br /> @(Model.OverdueCount?.ToString() ?? "N/A")</p>
+                    <p><strong>Overdue Limit:</strong><br /> @(Model.OverdueLimit?.ToString() ?? "N/A")</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <dt>Join Date</dt>
-        <dd>@(Model.JoinDate?.ToString("yyyy-MM-dd") ?? "N/A")</dd>
-        
-        <dt>Expiry Date</dt>
-        <dd>@(Model.ExpiryDate?.ToString("yyyy-MM-dd") ?? "N/A")</dd>
-        
-        <dt>Total Books Borrowed</dt>
-        <dd>@(Model.TotalBooksBorrowed?.ToString() ?? "N/A")</dd>
-        
-        <dt>Outstanding Fines</dt>
-        <dd>@(Model.OutstandingFines?.ToString() ?? "N/A")</dd>
-
-        <dt>Role</dt>
-        <dd>
-            @{
-                var role = roles?.FirstOrDefault(c => c.RoleId == user.RoleId);
-                @(role != null ? role.RoleName : "Not Assigned");
-            }
-        </dd>
-        <dt>Books Borrowed</dt>
-        <dd>@(Model.TotalBooksBorrowed?.ToString() ?? "N/A")</dd>
-        <dt>Overdue Count</dt>
-        <dd>@(Model.OverdueCount?.ToString() ?? "N/A")</dd>
-        <dt>Overdue Limit</dt>
-        <dd>@(Model.OverdueLimit?.ToString() ?? "N/A")</dd>
-        
-    </dl>
-
-    @* @using (Html.BeginForm("Delete", "Book", FormMethod.Post)) *@
-    @* { *@
-    @*     @Html.AntiForgeryToken() *@
-    @*     @Html.HiddenFor(model => model.BookId) *@
-    @* *@
-    @*     <input type="submit" value="Delete" class="btn btn-danger" /> *@
-    @*     @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" }) *@
-    @* } *@
+    <!-- Alerts -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
 </div>
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}
+
+<!-- Inline Styles -->
+<style>
+    .container {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .profile-card {
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .card-img-top {
+        border-radius: 10px;
+        width: 100%;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    .alert {
+        margin-top: 20px;
+    }
+
+    .alert-success, .alert-danger {
+        background-color: #233e45;
+        color: white;
+    }
+</style>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
-
-

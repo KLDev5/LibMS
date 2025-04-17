@@ -306,6 +306,7 @@
         <Compile Include="CustomExceptions\BorrowRecordsExceptions.cs" />
         <Compile Include="CustomExceptions\CustomCommonExceptions.cs" />
         <Compile Include="CustomExceptions\DatabaseExceptions.cs" />
+        <Compile Include="CustomExceptions\FileOperationsExceptions.cs" />
         <Compile Include="CustomExceptions\LoginUserExceptions.cs" />
         <Compile Include="CustomExceptions\MemberMasterExceptions.cs" />
         <Compile Include="CustomExceptions\UserMasterExceptions.cs" />
@@ -409,11 +410,20 @@
         <Compile Include="Migrations\202504011008547_ChangeConfigIdLibraryConfiguration.Designer.cs">
           <DependentUpon>202504011008547_ChangeConfigIdLibraryConfiguration.cs</DependentUpon>
         </Compile>
+        <Compile Include="Migrations\202504160624286_AddBookImageColumn.cs" />
+        <Compile Include="Migrations\202504160624286_AddBookImageColumn.Designer.cs">
+          <DependentUpon>202504160624286_AddBookImageColumn.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Migrations\202504160940456_AddUserImage.cs" />
+        <Compile Include="Migrations\202504160940456_AddUserImage.Designer.cs">
+          <DependentUpon>202504160940456_AddUserImage.cs</DependentUpon>
+        </Compile>
         <Compile Include="Migrations\Configuration.cs" />
         <Compile Include="Models\Books.cs" />
         <Compile Include="Models\BookStatus.cs" />
         <Compile Include="Models\BorrowRecords.cs" />
         <Compile Include="Models\ChangePasswordView.cs" />
+        <Compile Include="Models\Dashboard.cs" />
         <Compile Include="Models\LibraryConfiguration.cs" />
         <Compile Include="Models\LibraryDBContext.cs" />
         <Compile Include="Models\Login.cs" />
@@ -429,6 +439,14 @@
         <Content Include="Content\bootstrap.css" />
         <Content Include="Content\bootstrap.min.css" />
         <Content Include="Content\Images\bg1.jpg" />
+        <Content Include="Content\Images\BookImages\no_preview.png" />
+        <Content Include="Content\Images\cardbg1.jpg" />
+        <Content Include="Content\Images\cardbg2.jpg" />
+        <Content Include="Content\Images\cardbg3.jpg" />
+        <Content Include="Content\Images\cardbg4.jpg" />
+        <Content Include="Content\Images\cardbg5.jpg" />
+        <Content Include="Content\Images\no_preview.png" />
+        <Content Include="Content\Images\UserImages\no_preview.png" />
         <Content Include="Content\PagedList.css" />
         <Content Include="favicon.ico" />
         <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -576,6 +594,12 @@
       </EmbeddedResource>
       <EmbeddedResource Include="Migrations\202504011008547_ChangeConfigIdLibraryConfiguration.resx">
         <DependentUpon>202504011008547_ChangeConfigIdLibraryConfiguration.cs</DependentUpon>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Migrations\202504160624286_AddBookImageColumn.resx">
+        <DependentUpon>202504160624286_AddBookImageColumn.cs</DependentUpon>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Migrations\202504160940456_AddUserImage.resx">
+        <DependentUpon>202504160940456_AddUserImage.cs</DependentUpon>
       </EmbeddedResource>
     </ItemGroup>
     <PropertyGroup>

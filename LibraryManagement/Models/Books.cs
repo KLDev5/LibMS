@@ -27,6 +27,8 @@ namespace LibraryManagement.Models
         public long BookStatusID { get; set; }
         
         public virtual BookStatus BookStatus { get; set; }
+        
+        public string BookImage { get; set; }
     }
     
     
@@ -47,6 +49,7 @@ namespace LibraryManagement.Models
         public long BookStatusID
         { get; set; }
         
+        public string BookImage { get; set; }
     
     }
 }

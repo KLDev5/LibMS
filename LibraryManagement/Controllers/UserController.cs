@@ -16,10 +16,6 @@ namespace LibraryManagement.Controllers
         private LibraryDBContext db = new LibraryDBContext();
 
         #region Index
-
-        
-
-       
         public ActionResult Index(int? page,string searchUserId,string searchFullName,string searchEmail,string SearchRoleID)
         {
             try
