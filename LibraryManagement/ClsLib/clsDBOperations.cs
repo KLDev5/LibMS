@@ -519,7 +519,9 @@ namespace LibraryManagement.ClsLib
                         join b in db.Books on r.BookId equals b.BookId
                         join u in db.Users on m.UserId equals u.UserId
                         where r.BorrowStatusId == 1 && r.isDeleted == false &&
-                              u.UserId == userid //request data only of individual member when the user is only member
+                              u.UserId == userid &&
+                              b.BookStatusID==1 
+                        //request data only of individual member when the user is only member and book is not borrowed(it should eb available)
                         orderby r.BorrowId
                         select new PendingRequestViewModel
                         {
@@ -539,6 +541,8 @@ namespace LibraryManagement.ClsLib
                         join b in db.Books on r.BookId equals b.BookId
                         join u in db.Users on m.UserId equals u.UserId
                         where r.BorrowStatusId == 1 && r.isDeleted == false
+                                                    &&
+                                                    b.BookStatusID==1 
                         orderby r.BorrowId
                         select new PendingRequestViewModel
                         {

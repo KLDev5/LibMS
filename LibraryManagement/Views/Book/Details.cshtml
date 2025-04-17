@@ -3,74 +3,129 @@
 
 @{
     ViewBag.Title = "Book Details";
+    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>;
 }
 
-<h2>Book Details</h2>
+<style>
+    .book-details-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        font-family: 'Varela Round', sans-serif;
+    }
 
-<h3>Description of the Book Titled @Model.Title</h3>
-@{
-    var statuses = ViewBag.statuses as List<LibraryManagement.Models.BookStatus>; //viewbag for status name
-}
-<div>
-    <hr />
-    <dl class="dl-horizontal">
-        @* <dt>preview</dt> *@
-        <dd>
-            
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" style="width: 320px" src="@Url.Content(!string.IsNullOrEmpty(Model.BookImage) ? Model.BookImage : ConfigurationManager.AppSettings["ImageNoPreviewPath"])" alt="Preview Not Available" />
-                @* <div class="card-body"> *@
-                @*     <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> *@
-                @* </div> *@
-            </div>
-        </dd>
-        <dd></dd>
-        <dt>Title</dt>
-        <dd>@Model.Title</dd>
+    .book-details-header {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: rgba(35, 62, 69, 0.91);
+        text-align: center;
+    }
 
-        <dt>Author</dt>
-        <dd>@Model.Author</dd>
+    .book-details-subheader {
+        font-size: 20px;
+        color: #ffffff;
+        margin-bottom: 30px;
+        text-align: center;
+    }
 
-        <dt>Year</dt>
-        <dd>@Model.Publisher</dd>
+    .book-card {
+        display: flex;
+        flex-wrap: wrap;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
 
-        <dt>Author</dt>
-        <dd>@Model.ISBN</dd>
+    .book-image {
+        flex: 1;
+        min-width: 300px;
+        max-width: 400px;
+        background-color: #f7f7f7;
+        text-align: center;
+        padding: 20px;
+    }
 
-        <dt>Year</dt>
-        <dd>@Model.PublishedDate</dd>
+    .book-image img {
+        max-width: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+    }
 
-        <dt>Book Status</dt>
-        <dd>
-            @{
-                var status = statuses?.FirstOrDefault(c => c.BookStatusID == Model.BookStatusID);
-                @(status != null ? status.BookStatusName : "No Status")
-                ;
-            }
-        </dd>
-    </dl>
+    .book-info {
+        flex: 2;
+        padding: 30px;
+    }
 
-    @* @using (Html.BeginForm("Delete", "Book", FormMethod.Post)) *@
-    @* { *@
-    @*     @Html.AntiForgeryToken() *@
-    @*     @Html.HiddenFor(model => model.BookId) *@
-    @* *@
-    @*     <input type="submit" value="Delete" class="btn btn-danger" /> *@
-    @*     @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" }) *@
-    @* } *@
+    .book-info dt {
+        font-weight: bold;
+        margin-top: 10px;
+        color: #222;
+    }
+
+    .book-info dd {
+        margin-left: 0;
+        margin-bottom: 10px;
+        color: rgba(35, 62, 69, 0.91);
+    }
+
+    .alert {
+        margin-top: 20px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="book-details-container">
+    <div class="book-details-header">Book Details</div>
+    <div class="book-details-subheader">Description of the Book Titled <strong>@Model.Title</strong></div>
+
+    <div class="book-card">
+        <div class="book-image">
+            <img src="@Url.Content(!string.IsNullOrEmpty(Model.BookImage) ? Model.BookImage : ConfigurationManager.AppSettings["ImageNoPreviewPath"])" alt="Preview Not Available" />
+        </div>
+        <div class="book-info">
+            <dl>
+                <dt>Title</dt>
+                <dd>@Model.Title</dd>
+
+                <dt>Author</dt>
+                <dd>@Model.Author</dd>
+
+                <dt>Publisher</dt>
+                <dd>@Model.Publisher</dd>
+
+                <dt>ISBN</dt>
+                <dd>@Model.ISBN</dd>
+
+                <dt>Published Date</dt>
+                <dd>@Model.PublishedDate</dd>
+
+                <dt>Book Status</dt>
+                <dd>
+                    @{
+                        var status = statuses?.FirstOrDefault(c => c.BookStatusID == Model.BookStatusID);
+                        @(status != null ? status.BookStatusName : "No Status")
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
 </div>
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
