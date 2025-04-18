@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using LibraryManagement.LibEnums;
 using LibraryManagement.Models;
+using BorrowStatus = LibraryManagement.LibEnums.BorrowStatus;
 
 namespace LibraryManagement.Controllers
 {
@@ -26,26 +28,26 @@ namespace LibraryManagement.Controllers
                 long TotalBooksBorrowed;
                 
                 
-                if (roleid == 3)
+                if (roleid == (int)Roles.Member)
                 {
                     BooksOverdueCount= db.BorrowRecords
-                        .Where(br => br.BorrowStatusId == 2 
+                        .Where(br => br.BorrowStatusId == (int)BorrowStatus.ApprovedOrBorrowed  
                                      && br.OverdueStatus == true
                                      && br.Member.UserId == userid)
                         .Count();
                     
                     TotalBooksBorrowed=db.BorrowRecords
-                        .Where(br => br.BorrowStatusId == 2 && br.Member.UserId == userid)
+                        .Where(br => br.BorrowStatusId == (int)BorrowStatus.ApprovedOrBorrowed  && br.Member.UserId == userid)
                         .Select(br => br.BookId)
                         .Distinct()
                         .Count();
                 }
                 else
                 {
-                    BooksOverdueCount=db.BorrowRecords.Count(b => b.isDeleted==false && b.BorrowStatusId==2 && b.OverdueStatus== true  );
+                    BooksOverdueCount=db.BorrowRecords.Count(b => b.isDeleted==false && b.BorrowStatusId==(int)BorrowStatus.ApprovedOrBorrowed  && b.OverdueStatus== true  );
 
                     TotalBooksBorrowed=db.BorrowRecords
-                        .Where(b => b.BorrowStatusId == 2)
+                        .Where(b => b.BorrowStatusId == (int)BorrowStatus.ApprovedOrBorrowed)
                         .Select(b => b.BookId)
                         .Distinct()
                         .Count();

@@ -14,6 +14,7 @@ using LibraryManagement.CustomExceptions;
 using PagedList;
 using System.IO;
 using LibraryManagement.ClsLib;
+using BookStatus = LibraryManagement.LibEnums.BookStatus;
 
 namespace LibraryManagement.Controllers
 {
@@ -522,7 +523,7 @@ namespace LibraryManagement.Controllers
                                     out var publishedDate
                                 ) ? (DateTime)publishedDate : throw new Exception($"Invalid date format for PublishedDate: {values[4]}"),
                                 isDeleted = false,
-                                BookStatusID = 1
+                                BookStatusID = (int)BookStatus.Available
                                 
                             };
 

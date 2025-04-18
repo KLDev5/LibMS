@@ -314,6 +314,9 @@
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
+        <Compile Include="LibEnums\BookStatus.cs" />
+        <Compile Include="LibEnums\BorrowStatus.cs" />
+        <Compile Include="LibEnums\Roles.cs" />
         <Compile Include="Migrations\202503200933158_addBookStatus.cs" />
         <Compile Include="Migrations\202503200933158_addBookStatus.Designer.cs">
           <DependentUpon>202503200933158_addBookStatus.cs</DependentUpon>

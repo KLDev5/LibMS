@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using LibraryManagement.Models;
 using LibraryManagement.CustomExceptions;
 using LibraryManagement.ClsLib;
+using LibraryManagement.LibEnums;
 
 
 namespace LibraryManagement.Controllers
@@ -160,7 +161,7 @@ namespace LibraryManagement.Controllers
                     user.FullName= Register.FullName;
                     user.Email=Register.Email;
                     user.IsDeleted = false;
-                    user.RoleId = DefaultRole.RoleId;
+                    user.RoleId = (int)Roles.Member; //DefaultRole.RoleId;
                     user.PasswordHash = ClsPasswordEncryption.HashPassword(Register.Password);
                     db.Users.Add(user);
                     #endregion

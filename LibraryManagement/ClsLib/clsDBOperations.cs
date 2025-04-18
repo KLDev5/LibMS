@@ -13,7 +13,10 @@ using LibraryManagement.Models;
 using LibraryManagement.CustomExceptions;
 using PagedList;
 using System.IO;
+using LibraryManagement.LibEnums;
 using Microsoft.EntityFrameworkCore;
+using BookStatus = LibraryManagement.LibEnums.BookStatus;
+using BorrowStatus = LibraryManagement.LibEnums.BorrowStatus;
 
 
 namespace LibraryManagement.ClsLib
@@ -59,7 +62,7 @@ namespace LibraryManagement.ClsLib
                 //if only available is true
                 if (OnlyAvailable??false)
                 {
-                    Books = db.Books.Where(b => b.isDeleted == false && b.BookStatusID == 1)
+                    Books = db.Books.Where(b => b.isDeleted == false && b.BookStatusID == (int)BookStatus.Available)
                         .ToList().OrderBy(b => b.BookId).AsQueryable();
                     return Books;
                 }
@@ -182,14 +185,14 @@ namespace LibraryManagement.ClsLib
                 else if (role == 2)
                 {
                     userlist = db.Users
-                        .Where(u => u.IsDeleted == false && u.RoleId == 3) // Filter out deleted users
+                        .Where(u => u.IsDeleted == false && u.RoleId == (int)Roles.Member) // Filter out deleted users
                         .OrderBy(u => u.UserId);
                 }
                 else
                 {
                    
                     userlist = db.Users
-                        .Where(u => u.IsDeleted == false && u.RoleId == 3) // Filter out deleted users
+                        .Where(u => u.IsDeleted == false && u.RoleId == (int)Roles.Member) // Filter out deleted users
                         .OrderBy(u => u.UserId); //this needs to be changed.. as visibility of this link is not there in login.layout we have not changed the code
                 }
 
@@ -312,7 +315,7 @@ namespace LibraryManagement.ClsLib
                         join ApproveUser in db.Users on ApproverMember.UserId equals ApproveUser.UserId
                         join B in db.Books on R.BookId equals B.BookId
                         join BS in db.BookStatuses on B.BookStatusID equals BS.BookStatusID
-                        where R.BorrowStatusId == 2 && R.isDeleted == false &&
+                        where R.BorrowStatusId == (int)BorrowStatus.ApprovedOrBorrowed && R.isDeleted == false &&
                               BorrowUser.UserId ==
                               userid //request data only of individual member when the user is only member
                         orderby R.BorrowId descending
@@ -342,7 +345,7 @@ namespace LibraryManagement.ClsLib
                         join ApproveUser in db.Users on ApproverMember.UserId equals ApproveUser.UserId
                         join B in db.Books on R.BookId equals B.BookId
                         join BS in db.BookStatuses on B.BookStatusID equals BS.BookStatusID
-                        where R.BorrowStatusId == 2 && R.isDeleted == false 
+                        where R.BorrowStatusId == (int)BorrowStatus.ApprovedOrBorrowed && R.isDeleted == false 
                             //request data only of individual member when the user is only member
                         orderby R.BorrowId descending
                         select new ApprovedBorrowedRecordsViewModel
@@ -518,9 +521,9 @@ namespace LibraryManagement.ClsLib
                         join m in db.Members on r.MemberId equals m.MemberId
                         join b in db.Books on r.BookId equals b.BookId
                         join u in db.Users on m.UserId equals u.UserId
-                        where r.BorrowStatusId == 1 && r.isDeleted == false &&
+                        where r.BorrowStatusId == (int)BorrowStatus.Requested && r.isDeleted == false &&
                               u.UserId == userid &&
-                              b.BookStatusID==1 
+                              b.BookStatusID==(int)BookStatus.Available
                         //request data only of individual member when the user is only member and book is not borrowed(it should eb available)
                         orderby r.BorrowId
                         select new PendingRequestViewModel
@@ -540,9 +543,9 @@ namespace LibraryManagement.ClsLib
                         join m in db.Members on r.MemberId equals m.MemberId
                         join b in db.Books on r.BookId equals b.BookId
                         join u in db.Users on m.UserId equals u.UserId
-                        where r.BorrowStatusId == 1 && r.isDeleted == false
-                                                    &&
-                                                    b.BookStatusID==1 
+                        where r.BorrowStatusId == (int)BorrowStatus.Requested && r.isDeleted == false
+                                                                    &&
+                                                                    b.BookStatusID==(int)BookStatus.Available
                         orderby r.BorrowId
                         select new PendingRequestViewModel
                         {
@@ -573,8 +576,7 @@ namespace LibraryManagement.ClsLib
             {
                 DateTime parsedDate;
                 List<PendingRequestViewModel> PendingRequestList = new List<PendingRequestViewModel>();
-                IQueryable<PendingRequestViewModel> PendingRequests;
-
+                IQueryable<PendingRequestViewModel> PendingRequests;                                                      
                 using (var connection = new SqlConnection(dbcon))
                 {
                     using (var command = new SqlCommand("sp_FilteredViewPendingBorrowRequest", connection))
@@ -862,7 +864,7 @@ namespace LibraryManagement.ClsLib
 
 
                  return  db.Members
-                        .Where(m => m.User.RoleId == 3 && m.User.UserId == user) // Filter members with RoleId = 3
+                        .Where(m => m.User.RoleId == (int)Roles.Member && m.User.UserId == user) // Filter members with RoleId = 3
                         .OrderBy(m => m.MemberId) // Ensure ordering before pagination
                         .Select(m => new MemberView
                         {
@@ -883,7 +885,7 @@ namespace LibraryManagement.ClsLib
                 else
                 {
                  return   db.Members
-                        .Where(m => m.User.RoleId == 3 && m.User.IsDeleted == false) // Filter members with RoleId = 3
+                        .Where(m => m.User.RoleId == (int)Roles.Member && m.User.IsDeleted == false) // Filter members with RoleId = 3
                         .OrderBy(m => m.MemberId) // Ensure ordering before pagination
                         .Select(m => new MemberView
                         {

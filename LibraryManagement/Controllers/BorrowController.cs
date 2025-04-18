@@ -11,6 +11,8 @@ using LibraryManagement.ClsLib;
 using LibraryManagement.Models;
 using LibraryManagement.CustomExceptions;
 using PagedList;
+using BookStatus = LibraryManagement.LibEnums.BookStatus;
+using BorrowStatus = LibraryManagement.LibEnums.BorrowStatus;
 
 namespace LibraryManagement.Controllers
 {
@@ -33,7 +35,7 @@ namespace LibraryManagement.Controllers
                 Member member=db.Members.FirstOrDefault(m=>m.UserId==userid);
                 if (member == null) throw new MemberMasterExceptions.MemberNotFoundException(); 
 
-                BorrowRecord borrowRecord = db.BorrowRecords.FirstOrDefault(b => b.BookId == book.BookId &&  b.MemberId == member.MemberId && b.BorrowStatusId != 3);
+                BorrowRecord borrowRecord = db.BorrowRecords.FirstOrDefault(b => b.BookId == book.BookId &&  b.MemberId == member.MemberId && b.BorrowStatusId != (int)BorrowStatus.ReturnedOrAvailable);
                 if(borrowRecord!=null){ //if there is already a borrow record by the same user then request button will not be shown or will be shown readonly
                     
                     ViewBag.AlreadyRequested = "Requested";
@@ -79,7 +81,7 @@ namespace LibraryManagement.Controllers
                 BorrowRecord borrowRecord = new BorrowRecord();
                 borrowRecord.BookId = id;
                 borrowRecord.MemberId = member.MemberId;
-                borrowRecord.BorrowStatusId = 1;
+                borrowRecord.BorrowStatusId = (int)BorrowStatus.Requested;
                 db.BorrowRecords.Add(borrowRecord);
                 db.SaveChanges();
         
@@ -203,7 +205,7 @@ namespace LibraryManagement.Controllers
                 if (borrowRecord == null) throw new BorrowRecordsExceptions.BorrowRecordNotFoundExceptions();
                 
                 
-                borrowRecord.BorrowStatusId = 2;// approved 
+                borrowRecord.BorrowStatusId = (int)BorrowStatus.ApprovedOrBorrowed;// approved 
                 borrowRecord.BorrowDate=DateTime.Now;
                 borrowRecord.ScheduledReturnDate = (borrowRecord.BorrowDate ?? DateTime.Now).AddDays(DefaultBookDuration);
                 
@@ -225,7 +227,7 @@ namespace LibraryManagement.Controllers
                 #region change book status
                 Book book = db.Books.Find(borrowRecord.BookId);
                 if (book == null) throw new BookMasterExceptions.BookNotFoundExceptions();
-                book.BookStatusID = 2; // book status changed to borrowed
+                book.BookStatusID = (int)BookStatus.Borrowed; // book status changed to borrowed
                 #endregion
                 
                 #region Member book borrow count update
@@ -448,7 +450,7 @@ namespace LibraryManagement.Controllers
                  
                  RecordDetails.ActualReturnDate = DateTime.Now.Date;
                  borrowRecord.ActualReturnDate = RecordDetails.ActualReturnDate;
-                 borrowRecord.BorrowStatusId = 3;
+                 borrowRecord.BorrowStatusId = (int)BorrowStatus.ReturnedOrAvailable;
                  ViewBag.RecordDetails = RecordDetails;
 
                 return View(borrowRecord);
@@ -500,7 +502,7 @@ namespace LibraryManagement.Controllers
                 #region BorrowRecordDetails
 
                 var dbBorrowrecorddetail = db.BorrowRecordDetails
-                    .Where(bd => bd.BorrowId == borrowRecord.BorrowId && bd.BorrowStatusId == 2).SingleOrDefault();
+                    .Where(bd => bd.BorrowId == borrowRecord.BorrowId && bd.BorrowStatusId == (int)BorrowStatus.ApprovedOrBorrowed).SingleOrDefault();
                 
                 if (dbBorrowrecorddetail == null)
                     throw new BorrowRecordsExceptions.BorrowRecordDetailsNotFoundExceptions();
@@ -520,7 +522,7 @@ namespace LibraryManagement.Controllers
 
                 var dbbook = db.Books.Find(dbborrow.BookId);
                 if (dbbook == null) throw new BookMasterExceptions.BookNotFoundExceptions();
-                dbbook.BookStatusID = 1; //chnged to available
+                dbbook.BookStatusID = (int)BookStatus.Available; //chnged to available
                 
                 #endregion
                 
